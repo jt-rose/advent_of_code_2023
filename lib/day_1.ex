@@ -26,6 +26,13 @@ defmodule Day1 do
     |> Enum.sum()
   end
 
+  defp get_calibration_value(str) do
+    first_int = find_starting_num(str)
+    last_int = find_ending_num(str)
+
+    first_int * 10 + last_int
+  end
+
   defp find_starting_num(str) do
     [num] = Regex.run(~r/\d|one|two|three|four|five|six|seven|eight|nine/, str)
     num |> convert_to_int()
@@ -42,12 +49,5 @@ defmodule Day1 do
 
   defp convert_to_int(number_word) do
     Map.get(@number_words, number_word)
-  end
-
-  defp get_calibration_value(str) do
-    first_int = find_starting_num(str)
-    last_int = find_ending_num(str)
-
-    first_int * 10 + last_int
   end
 end
