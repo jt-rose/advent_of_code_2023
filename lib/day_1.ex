@@ -1,6 +1,6 @@
 defmodule Day1 do
   @moduledoc """
-  Documentation for `AdventOfCode2023` Day 1 Solution.
+  `AdventOfCode2023` Day 1 Solution.
 
   Link: https://adventofcode.com/2023/day/1
   """
