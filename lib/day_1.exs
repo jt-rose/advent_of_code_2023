@@ -41,8 +41,8 @@ defmodule Day1 do
 
   def sum_number_boundaries(text) do
     text
+    |> String.trim()
     |> String.split("\n")
-    |> Enum.filter(fn str -> str != "" end)
     |> Enum.map(&get_outer_numbers/1)
     |> Enum.sum()
   end
