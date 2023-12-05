@@ -8,41 +8,54 @@ defmodule Day4 do
   def solve_part_1(text) do
     text
     |> String.split("\n")
-    |> Enum.map(&get_card_numbers/1)
-    |> Enum.map(&filter_winning_numbers/1)
-    |> Enum.map(&get_score/1)
+    |> Enum.map(&Card.init/1)
+    |> Enum.map(fn card -> get_score(card.wins) end)
     |> Enum.sum()
   end
 
   def solve_part_2(text) do
-    card_list_info =
-      text
-      |> String.split("\n")
-      |> Enum.map(&get_card_numbers/1)
-      |> Enum.map(&filter_winning_numbers/1)
+    text
+    |> String.split("\n")
+    |> Enum.map(&Card.init/1)
+    |> count_total_cards(0)
+  end
 
-    repetitions = List.duplicate(1, length(card_list_info))
-
-    count_total_cards(card_list_info, 0, repetitions)
+  # calculate card score based on rules of AOC part 1
+  def get_score(wins, score \\ 0) do
+    if wins == 0 do
+      score
+    else
+      new_score = max(score * 2, 1)
+      get_score(wins - 1, new_score)
+    end
   end
 
   # recurse through card info and update current and future repetitions of cards
-  def count_total_cards([], count, _reps), do: count
+  def count_total_cards([], count), do: count
 
-  def count_total_cards([card_info | card_info_list], count, [rep | repetitions]) do
-    len = length(card_info)
-
-    updated_reps = update_cycles(repetitions, rep, len)
-    count_total_cards(card_info_list, count + rep, updated_reps)
+  def count_total_cards([%{wins: wins, frequency: fr} | card_list], count) do
+    updated_card_list = update_frequencies(card_list, wins, fr)
+    count_total_cards(updated_card_list, count + fr)
   end
 
-  # update how many times each of the next cards will appear
-  def update_cycles(repetitions, _multiplier, 0), do: repetitions
+  # update frequencies of cards in card list
+  def update_frequencies(card_list, 0, _frequency), do: card_list
 
-  def update_cycles(repetitions, multiplier, len) do
-    repetitions
-    |> List.update_at(len - 1, &(&1 + multiplier))
-    |> update_cycles(multiplier, len - 1)
+  def update_frequencies(card_list, wins, frequency) do
+    card_list
+    |> List.update_at(wins - 1, fn card -> %{card | frequency: card.frequency + frequency} end)
+    |> update_frequencies(wins - 1, frequency)
+  end
+end
+
+defmodule Card do
+  defstruct wins: 0, frequency: 1
+
+  def init(card_text) do
+    card_text
+    |> get_card_numbers
+    |> filter_winning_numbers
+    |> format_card
   end
 
   # extract the winning numbers and user numbers from the card text
@@ -58,8 +71,8 @@ defmodule Day4 do
     Enum.filter(user_nums, fn x -> x in winning_nums end)
   end
 
-  # update overall score based on score formula in AOC instructions
-  def get_score(matching_cards) do
-    Enum.reduce(matching_cards, 0, fn _x, acc -> max(acc * 2, 1) end)
+  # creates a new Card based on the amount of winning numbers
+  def format_card(winning_numbers) do
+    %Card{wins: length(winning_numbers)}
   end
 end
