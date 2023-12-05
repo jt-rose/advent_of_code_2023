@@ -9,8 +9,7 @@ defmodule Day4 do
     text
     |> String.split("\n")
     |> Enum.map(&Card.init/1)
-    |> Enum.map(fn card -> get_score(card.wins) end)
-    |> Enum.sum()
+    |> Enum.reduce(0, fn card, acc -> get_score(card.wins) + acc end)
   end
 
   def solve_part_2(text) do
@@ -30,7 +29,7 @@ defmodule Day4 do
     end
   end
 
-  # recurse through card info and update current and future repetitions of cards
+  # recurse through card info and update frequencies of cards
   def count_total_cards([], count), do: count
 
   def count_total_cards([%{wins: wins, frequency: fr} | card_list], count) do
@@ -49,6 +48,12 @@ defmodule Day4 do
 end
 
 defmodule Card do
+  @moduledoc """
+  Stores the amount of wins a card has, as well as the frequency it comes up
+  As cards become multiplies based on the rules of AoC  Day 4 part 2
+  The frequency value will increase and be used when calculating the frequencies
+  of other cards that come after it
+  """
   defstruct wins: 0, frequency: 1
 
   def init(card_text) do
